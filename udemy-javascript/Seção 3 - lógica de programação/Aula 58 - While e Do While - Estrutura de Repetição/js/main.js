@@ -21,10 +21,14 @@ const max = 50;
 
 let rand = random (min, max);
 
-
 while (rand !== 10) {
     rand = random(min, max);
     console.log(rand);
 }
 
-
+console.log ('#########')
+// do while: executa depois checa
+do {
+    rand = random(min, max);
+    console.log(rand)
+} while (rand !== 10);
