@@ -1,70 +1,83 @@
-function relogio() {
-    function getTimeFromSeconds(seconds) {
-        const data = new Date(seconds * 1000);
-        return data.toLocaleTimeString('pt-BR', {
-            hour12: false,
-            timeZone: 'UTC'
-        });
+//selecionando as classes criadas no HTML;
+// cria const, chama no querySelector
+
+const inputTarefa = document.querySelector('.input-tarefa');
+const btnTarefa = document.querySelector('.btn-tarefa');
+const tarefas = document.querySelector('.tarefas');
+
+// capta a tecla enter
+inputTarefa.addEventListener('keypress', function (e) {
+    if (e.keyCode === 13) {
+        if (!inputTarefa.value) return;
+        criaTarefa(inputTarefa.value);
     }
-
-    // selecionando a classe relogio
-    const relogio = document.querySelector('.relogio');
-
-    let seconds = 0;
-
-    let timer;
-
-    function iniciaRelogio() {
-        timer = setInterval(() => {
-            seconds++;
-            relogio.innerHTML = getTimeFromSeconds(seconds)
-        }, 1000);
-    }
-
-    // selecionar a variável iniciar com addEventListener
-    // marcar o click e adicionar a função desejada para capturar
-    // replicar para todos os eventos
-
-    // iniciar.addEventListener('click', (event) => {
-    //     relogio.classList.remove('pausado');
-    //     clearInterval(timer);
-    //     iniciaRelogio();
-    // });
-
-    // pausar.addEventListener('click', (event) => {
-    //     relogio.classList.add('pausado');
-    //     clearInterval(timer);
-    // });
-
-    // zerar.addEventListener('click', (event) => {
-    //     clearInterval(timer);
-    //     relogio.innerHTML = '00:00:00';
-    //     seconds = 0
-    // });
-
-    // inves de chamar cada um dos elementos, cada um dos addEventListener...
-
-    document.addEventListener('click', function (e) {
-        const el = e.target;
-        if (el.classList.contains('iniciar')) {
-            relogio.classList.remove('pausado');
-            clearInterval(timer);
-            iniciaRelogio();
-        }
-
-        if (el.classList.contains('pausar')) {
-            relogio.classList.add('pausado');
-            clearInterval(timer);
-        }
-
-        if (el.classList.contains('zerar')) {
-            clearInterval(timer);
-            relogio.innerHTML = '00:00:00';
-            seconds = 0;
-            relogio.classList.remove('pausado');
-        };
-
-    })
+});
+// limpa o formulário após enviar
+function limpaInput() {
+    inputTarefa.value = '';
+    inputTarefa.focus();
+}
+// cria uma li
+function criaLi() {
+    const li = document.createElement('li');
+    return li;
 }
 
-relogio();
+function criaBotaoApagar(li) {
+    li.innerText += ' ';
+    const botaoApagar = document.createElement('button');
+    botaoApagar.innerHTML = 'Apagar';
+    //botaoApagar.classList.add('apagar');
+    botaoApagar.setAttribute('class', 'apagar');
+    botaoApagar.setAttribute('title', 'Apagar esta tarefa');
+    li.appendChild(botaoApagar);
+}
+
+//cria a nova lista de tarefas
+function criaTarefa(textoInput) {
+    const li = criaLi();
+    li.innerHTML = textoInput;
+    tarefas.appendChild(li);
+    limpaInput();
+    criaBotaoApagar(li);
+    salvarTarefas();
+}
+// captura o evento de clique do botão
+btnTarefa.addEventListener('click', (e) => {
+    if (!inputTarefa.value) return;
+    criaTarefa(inputTarefa.value);
+});
+
+document.addEventListener('click', function (e) {
+    const el = e.target;
+
+    if (el.classList.contains('apagar')) {
+        el.parentElement.remove();
+        salvarTarefas();
+    }
+});
+
+function salvarTarefas() {
+    const liTarefas = tarefas.querySelectorAll('li');
+    const listaDeTarefas = [];
+
+    for (let tarefa of liTarefas) {
+        let tarefaTexto = tarefa.innerText;
+        tarefaTexto = tarefaTexto.replace('Apagar', '').trim();
+        listaDeTarefas.push(tarefaTexto);
+    }
+
+    const tarefasJSON = JSON.stringify(listaDeTarefas);
+    localStorage.setItem('tarefas', tarefasJSON);
+}
+
+function adicionaTarefasSalvas() {
+    const tarefas = localStorage.getItem('tarefas');
+    const listaDeTarefas = JSON.parse(tarefas);
+
+    for (let tarefa of listaDeTarefas) {
+        criaTarefa(tarefa);
+    }
+}
+
+adicionaTarefasSalvas();
