@@ -7,4 +7,3 @@ nomes[2] = 'João'
 
 console.log(nomes);
 
-.
